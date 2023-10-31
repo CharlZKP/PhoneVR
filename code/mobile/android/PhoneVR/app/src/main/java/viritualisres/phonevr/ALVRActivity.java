@@ -10,6 +10,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.BatteryManager;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
@@ -142,10 +144,9 @@ public class ALVRActivity extends AppCompatActivity
         super.onResume();
         Log.d(TAG, "Resuming ALVR Activity");
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        if (VERSION.SDK_INT < VERSION_CODES.Q) {
             // No explicit permission check needed for older Android versions
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        } else if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU && VERSION.SDK_INT < VERSION_CODES.Q) {
             // Request READ_EXTERNAL_STORAGE permission for Android 6.0 and later but before Android
             // 10
             final String[] permissions = new String[] {Manifest.permission.READ_EXTERNAL_STORAGE};
@@ -228,7 +229,7 @@ public class ALVRActivity extends AppCompatActivity
     }
 
     private boolean isReadExternalStorageEnabled() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (VERSION.SDK_INT >= VERSION_CODES.VERSION_CODES) {
             return ActivityCompat.checkSelfPermission(
                             this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED;

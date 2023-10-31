@@ -229,7 +229,7 @@ public class ALVRActivity extends AppCompatActivity
     }
 
     private boolean isReadExternalStorageEnabled() {
-        if (VERSION.SDK_INT >= VERSION_CODES.VERSION_CODES) {
+        if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
             return ActivityCompat.checkSelfPermission(
                             this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED;

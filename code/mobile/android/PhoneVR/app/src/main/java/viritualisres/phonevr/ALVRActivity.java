@@ -238,12 +238,20 @@ public class ALVRActivity extends AppCompatActivity
     }
 
     private boolean isReadExternalStorageEnabled() {
-        if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
+        if (VERSION.SDK_INT < VERSION_CODES.TIRAMISU) {
             return ActivityCompat.checkSelfPermission(
                             this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                            == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(
+                                    this, Manifest.permission.READ_MEDIA_VIDEO)
+                            == PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(
+                                    this, Manifest.permission.READ_MEDIA_AUDIO)
+                            == PackageManager.PERMISSION_GRANTED;
         }
-        return true; // No need for explicit permission check on older Android versions
     }
 
     @Override

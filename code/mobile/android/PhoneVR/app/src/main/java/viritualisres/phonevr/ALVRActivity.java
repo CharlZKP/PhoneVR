@@ -144,13 +144,27 @@ public class ALVRActivity extends AppCompatActivity
         super.onResume();
         Log.d(TAG, "Resuming ALVR Activity");
 
-        if (VERSION.SDK_INT < VERSION_CODES.Q && !isReadExternalStorageEnabled()) {
-            final String[] permissions = new String[] {Manifest.permission.READ_EXTERNAL_STORAGE};
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            // No explicit permission check needed for older Android versions
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            // Request READ_EXTERNAL_STORAGE permission for Android 6.0 and later but before Android 10
+            final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
             ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_REQUEST_CODE);
-
             return;
+        } else {
+            // For Android 10 and later, handle the new granular permissions as needed
+            if (!isReadExternalStorageEnabled()) {
+                final String[] permissions = new String[]{
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                    Manifest.permission.READ_MEDIA_AUDIO
+                };
+                ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_REQUEST_CODE);
+                return;
+            }
         }
 
+        // Continue with other initialization logic
         glView.onResume();
         resumeNative();
         bMonitor.startMonitoring(this);
@@ -213,28 +227,36 @@ public class ALVRActivity extends AppCompatActivity
     }
 
     private boolean isReadExternalStorageEnabled() {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED;
+        }
+        return true; // No need for explicit permission check on older Android versions
     }
 
     @Override
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (!isReadExternalStorageEnabled()) {
-            Toast.makeText(this, R.string.read_storage_permission, Toast.LENGTH_LONG).show();
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(
-                    this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                // Permission denied with checking "Do not ask again". Note that in Android R
-                // "Do not ask again" is not available anymore.
-                Intent intent = new Intent();
-                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                intent.setData(Uri.fromParts("package", getPackageName(), null));
-                startActivity(intent);
+        if (requestCode == PERMISSIONS_REQUEST_CODE) {
+            if (isReadExternalStorageEnabled()) {
+                // Permission granted, you can continue your app logic here
+            } else {
+                Toast.makeText(this, R.string.read_storage_permission, Toast.LENGTH_LONG).show();
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(
+                        this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    // Permission denied with checking "Do not ask again".
+                    // Note that in Android R, "Do not ask again" is not available anymore.
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    intent.setData(Uri.fromParts("package", getPackageName(), null));
+                    startActivity(intent);
+                }
+                finish();
             }
-            finish();
         }
     }
+
 
     private void setImmersiveSticky() {
         getWindow()

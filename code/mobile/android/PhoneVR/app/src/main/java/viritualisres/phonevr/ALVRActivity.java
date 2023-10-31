@@ -46,20 +46,29 @@ public class ALVRActivity extends AppCompatActivity
 
     public class BatteryMonitor extends BroadcastReceiver {
         private BatteryLevelListener listener;
+        private boolean isRegistered = false;
+
 
         public BatteryMonitor(BatteryLevelListener listener) {
             this.listener = listener;
         }
 
         public void startMonitoring(Context context) {
-            // Register BroadcastReceiver to monitor battery level changes
-            IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-            context.registerReceiver(this, filter);
+            if (!this.isRegistered) {
+                // Register BroadcastReceiver to monitor battery level changes
+                IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+                context.registerReceiver(this, filter);
+
+                this.isRegistered = true;
+            }
         }
 
         public void stopMonitoring(Context context) {
-            // Unregister the BroadcastReceiver
-            context.unregisterReceiver(this);
+            if (this.isRegistered) {
+                // Unregister the BroadcastReceiver
+                context.unregisterReceiver(this);
+        
+            }
         }
 
         @Override
@@ -136,7 +145,9 @@ public class ALVRActivity extends AppCompatActivity
         Log.d(TAG, "Pausing ALVR Activity");
         pauseNative();
         glView.onPause();
-        bMonitor.stopMonitoring(this);
+        if(bMonitor != null) {
+            bMonitor.stopMonitoring(this);
+        }
     }
 
     @Override

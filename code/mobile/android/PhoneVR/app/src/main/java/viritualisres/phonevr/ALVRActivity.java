@@ -10,8 +10,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.BatteryManager;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
@@ -146,19 +144,22 @@ public class ALVRActivity extends AppCompatActivity
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             // No explicit permission check needed for older Android versions
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            // Request READ_EXTERNAL_STORAGE permission for Android 6.0 and later but before Android 10
-            final String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            // Request READ_EXTERNAL_STORAGE permission for Android 6.0 and later but before Android
+            // 10
+            final String[] permissions = new String[] {Manifest.permission.READ_EXTERNAL_STORAGE};
             ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_REQUEST_CODE);
             return;
         } else {
             // For Android 10 and later, handle the new granular permissions as needed
             if (!isReadExternalStorageEnabled()) {
-                final String[] permissions = new String[]{
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                    Manifest.permission.READ_MEDIA_VIDEO,
-                    Manifest.permission.READ_MEDIA_AUDIO
-                };
+                final String[] permissions =
+                        new String[] {
+                            Manifest.permission.READ_MEDIA_IMAGES,
+                            Manifest.permission.READ_MEDIA_VIDEO,
+                            Manifest.permission.READ_MEDIA_AUDIO
+                        };
                 ActivityCompat.requestPermissions(this, permissions, PERMISSIONS_REQUEST_CODE);
                 return;
             }
@@ -228,7 +229,8 @@ public class ALVRActivity extends AppCompatActivity
 
     private boolean isReadExternalStorageEnabled() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+            return ActivityCompat.checkSelfPermission(
+                            this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED;
         }
         return true; // No need for explicit permission check on older Android versions
@@ -256,7 +258,6 @@ public class ALVRActivity extends AppCompatActivity
             }
         }
     }
-
 
     private void setImmersiveSticky() {
         getWindow()

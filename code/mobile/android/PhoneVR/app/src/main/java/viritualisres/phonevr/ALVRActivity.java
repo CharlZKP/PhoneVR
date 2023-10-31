@@ -48,7 +48,6 @@ public class ALVRActivity extends AppCompatActivity
         private BatteryLevelListener listener;
         private boolean isRegistered = false;
 
-
         public BatteryMonitor(BatteryLevelListener listener) {
             this.listener = listener;
         }
@@ -67,7 +66,6 @@ public class ALVRActivity extends AppCompatActivity
             if (this.isRegistered) {
                 // Unregister the BroadcastReceiver
                 context.unregisterReceiver(this);
-        
             }
         }
 
@@ -145,7 +143,7 @@ public class ALVRActivity extends AppCompatActivity
         Log.d(TAG, "Pausing ALVR Activity");
         pauseNative();
         glView.onPause();
-        if(bMonitor != null) {
+        if (bMonitor != null) {
             bMonitor.stopMonitoring(this);
         }
     }
